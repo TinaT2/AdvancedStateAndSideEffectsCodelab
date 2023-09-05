@@ -24,9 +24,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -34,7 +31,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.compose.rally.ui.accounts.AccountsScreen
+import com.example.compose.rally.ui.bills.BillsScreen
 import com.example.compose.rally.ui.components.RallyTabRow
+import com.example.compose.rally.ui.overview.OverviewScreen
 import com.example.compose.rally.ui.theme.RallyTheme
 
 
@@ -57,40 +57,42 @@ fun RallyApp() {
     RallyTheme {
         var navController = rememberNavController()
         val currentBackStack by navController.currentBackStackEntryAsState()
-        val currentScreen = rallyTabRowScreens.find { it.route == currentBackStack?.destination?.route}?:Overview
-        Scaffold(
-            topBar = {
-                RallyTabRow(
-                    allScreens = rallyTabRowScreens,
-                    onTabSelected = { newScreen ->
-                        navController.navigateSingleTopTo(newScreen.route)
-                    },
-                    currentScreen = currentScreen
-                )
-            }
-        ) { innerPadding ->
+        val currentScreen =
+            rallyTabRowScreens.find { it.route == currentBackStack?.destination?.route } ?: Overview
+        Scaffold(topBar = {
+            RallyTabRow(
+                allScreens = rallyTabRowScreens, onTabSelected = { newScreen ->
+                    navController.navigateSingleTopTo(newScreen.route)
+                }, currentScreen = currentScreen
+            )
+        }) { innerPadding ->
             NavHost(
                 navController = navController,
                 startDestination = Overview.route,
                 modifier = Modifier.padding(innerPadding)
             ) {
                 composable(route = Overview.route) {
-                    Overview.screen()
+                    OverviewScreen(onClickSeeAllAccounts = {
+                        navController.navigateSingleTopTo(
+                            Accounts.route
+                        )
+                    }, onClickSeeAllBills = {
+                        navController.navigateSingleTopTo(Bills.route)
+                    })
                 }
                 composable(route = Accounts.route) {
-                    Accounts.screen()
+                    AccountsScreen()
                 }
                 composable(route = Bills.route) {
-                    Bills.screen()
+                    BillsScreen()
                 }
             }
         }
     }
 }
 
-fun NavHostController.navigateSingleTopTo(route: String) =
-    this.navigate(route) {
-        popUpTo(this@navigateSingleTopTo.graph.findStartDestination().id) { saveState = true }
-        launchSingleTop = true
-        restoreState = true
-    }
+fun NavHostController.navigateSingleTopTo(route: String) = this.navigate(route) {
+    popUpTo(this@navigateSingleTopTo.graph.findStartDestination().id) { saveState = true }
+    launchSingleTop = true
+    restoreState = true
+}
