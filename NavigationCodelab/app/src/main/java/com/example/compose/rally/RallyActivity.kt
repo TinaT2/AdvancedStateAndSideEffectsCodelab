@@ -92,7 +92,9 @@ fun RallyApp() {
                     BillsScreen()
                 }
                 composable(
-                    route = SingleAccount.routWithArgs, arguments = SingleAccount.arguments
+                    route = SingleAccount.routWithArgs,
+                    arguments = SingleAccount.arguments,
+                    deepLinks = SingleAccount.deepLinks
                 ) {navBackStackEntry ->
                     val accountType =
                         navBackStackEntry.arguments?.getString(SingleAccount.accountTypeArg)
