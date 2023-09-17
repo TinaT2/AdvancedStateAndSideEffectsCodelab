@@ -20,6 +20,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
@@ -67,41 +68,52 @@ fun RallyApp() {
                 }, currentScreen = currentScreen
             )
         }) { innerPadding ->
-            NavHost(
-                navController = navController,
-                startDestination = Overview.route,
-                modifier = Modifier.padding(innerPadding)
-            ) {
-                composable(route = Overview.route) {
-                    OverviewScreen(onClickSeeAllAccounts = {
-                        navController.navigateSingleTopTo(
-                            Accounts.route
-                        )
-                    }, onClickSeeAllBills = {
-                        navController.navigateSingleTopTo(Bills.route)
-                    }, onAccountClick = { accountType ->
-                        navController.navigateToSingleAccount(accountType)
-                    })
-                }
-                composable(route = Accounts.route) {
-                    AccountsScreen(onAccountClick = { accountType ->
-                        navController.navigateToSingleAccount(accountType)
-                    })
-                }
-                composable(route = Bills.route) {
-                    BillsScreen()
-                }
-                composable(
-                    route = SingleAccount.routWithArgs,
-                    arguments = SingleAccount.arguments,
-                    deepLinks = SingleAccount.deepLinks
-                ) {navBackStackEntry ->
-                    val accountType =
-                        navBackStackEntry.arguments?.getString(SingleAccount.accountTypeArg)
+            RallyNavHost(
+                navController,
+                innerPadding
+            )
+        }
+    }
+}
 
-                    SingleAccountScreen(accountType)
-                }
-            }
+@Composable
+private fun RallyNavHost(
+    navController: NavHostController,
+    innerPadding: PaddingValues
+) {
+    NavHost(
+        navController = navController,
+        startDestination = Overview.route,
+        modifier = Modifier.padding(innerPadding)
+    ) {
+        composable(route = Overview.route) {
+            OverviewScreen(onClickSeeAllAccounts = {
+                navController.navigateSingleTopTo(
+                    Accounts.route
+                )
+            }, onClickSeeAllBills = {
+                navController.navigateSingleTopTo(Bills.route)
+            }, onAccountClick = { accountType ->
+                navController.navigateToSingleAccount(accountType)
+            })
+        }
+        composable(route = Accounts.route) {
+            AccountsScreen(onAccountClick = { accountType ->
+                navController.navigateToSingleAccount(accountType)
+            })
+        }
+        composable(route = Bills.route) {
+            BillsScreen()
+        }
+        composable(
+            route = SingleAccount.routWithArgs,
+            arguments = SingleAccount.arguments,
+            deepLinks = SingleAccount.deepLinks
+        ) { navBackStackEntry ->
+            val accountType =
+                navBackStackEntry.arguments?.getString(SingleAccount.accountTypeArg)
+
+            SingleAccountScreen(accountType)
         }
     }
 }
